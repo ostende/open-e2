@@ -1,4 +1,4 @@
-SUBDIRS = fonts extensions keymaps weather_icons countries
+SUBDIRS = fonts extensions keymaps countries
 
 dist_pkgdata_DATA = \
 	encoding.conf \
