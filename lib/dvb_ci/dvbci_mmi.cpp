@@ -21,6 +21,7 @@ eDVBCIMMISession::eDVBCIMMISession(eDVBCISlot *tslot)
 {
 	slot = tslot;
 	slot->setMMIManager(this);
+	is_mmi_active = false;
 }
 
 eDVBCIMMISession::~eDVBCIMMISession()
@@ -29,22 +30,28 @@ eDVBCIMMISession::~eDVBCIMMISession()
 	slot->mmiClosed();
 #endif
 	slot->setMMIManager(NULL);
-	eDVBCI_UI::getInstance()->mmiSessionDestroyed(slot->getSlotID());
+	if (is_mmi_active)
+		eDVBCI_UI::getInstance()->mmiSessionDestroyed(slot->getSlotID());
 }
 
 int eDVBCIMMISession::receivedAPDU(const unsigned char *tag, const void *data, int len)
 {
-	eDebugNoNewLine("SESSION(%d)/MMI %02x %02x %02x: ", session_nb, tag[0], tag[1],tag[2]);
+	eDebugNoNewLineStart("[CI MMI] SESSION(%d)/MMI %02x %02x %02x: ", session_nb, tag[0], tag[1],tag[2]);
 	for (int i=0; i<len; i++)
 		eDebugNoNewLine("%02x ", ((const unsigned char*)data)[i]);
-	eDebug("");
+
+	eDebugNoNewLine("\n");
 
 	if ((tag[0]==0x9f) && (tag[1]==0x88))
+	{
 		if (eDVBCI_UI::getInstance()->processMMIData(slot->getSlotID(), tag, data, len) == 1)
 		{
 			state=stateDisplayReply;
 			return 1;
 		}
+		else
+			is_mmi_active = true;
+	}
 
 	return 0;
 }
@@ -84,7 +91,7 @@ int eDVBCIMMISession::doAction()
 
 int eDVBCIMMISession::stopMMI()
 {
-	eDebug("eDVBCIMMISession::stopMMI()");
+	eDebug("[CI MMI] eDVBCIMMISession::stopMMI()");
 
 	unsigned char tag[]={0x9f, 0x88, 0x00};
 	unsigned char data[]={0x00};
@@ -95,7 +102,7 @@ int eDVBCIMMISession::stopMMI()
 
 int eDVBCIMMISession::answerText(int answer)
 {
-	eDebug("eDVBCIMMISession::answerText(%d)",answer);
+	eDebug("[CI MMI] eDVBCIMMISession::answerText(%d)",answer);
 
 	unsigned char tag[]={0x9f, 0x88, 0x0B};
 	unsigned char data[]={0x00};
@@ -108,7 +115,7 @@ int eDVBCIMMISession::answerText(int answer)
 int eDVBCIMMISession::answerEnq(char *answer)
 {
 	unsigned int len = strlen(answer);
-	eDebug("eDVBCIMMISession::answerEnq(%d bytes)", len);
+	eDebug("[CI MMI] eDVBCIMMISession::answerEnq(%d bytes)", len);
 
 	unsigned char data[len+1];
 	data[0] = 0x01; // answer ok
@@ -122,7 +129,7 @@ int eDVBCIMMISession::answerEnq(char *answer)
 
 int eDVBCIMMISession::cancelEnq()
 {
-	eDebug("eDVBCIMMISession::cancelEnq()");
+	eDebug("[CI MMI] eDVBCIMMISession::cancelEnq()");
 
 	unsigned char tag[]={0x9f, 0x88, 0x08};
 	unsigned char data[]={0x00}; // canceled
