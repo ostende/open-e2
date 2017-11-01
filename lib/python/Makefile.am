@@ -1,0 +1,2 @@
+SUBDIRS = Tools Plugins
+
