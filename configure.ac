@@ -1,4 +1,4 @@
-AC_INIT([enigma2],[6.1],[http://www.opena.tv])
+AC_INIT([enigma2],[8.0],[http://www.startimes.com])
 AM_INIT_AUTOMAKE([dist-bzip2 no-define tar-pax -Wno-portability])
 AC_CONFIG_HEADERS([enigma2_config.h])
 
@@ -737,12 +737,10 @@ data/fonts/Makefile
 data/keymaps/Makefile
 data/displaytext/Makefile
 data/display96/Makefile
-data/display128dm/Makefile
 data/display220/Makefile
 data/display400/Makefile
 data/display480/Makefile
 data/display720/Makefile
-data/display800/Default_with_Picon_Fullscreen/Makefile
 data/vfd128/Makefile
 data/vfd140/Makefile
 data/vfd255/Makefile
